@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}EasyLearning - AI-Powered PDF Learning{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center position-relative">
+        <h1 class="display-3 fw-bold mb-4 animate-fade-in-up">
+            <i class="fas fa-graduation-cap me-3"></i>EasyLearning
+        </h1>
+        <p class="lead mb-4 fs-5 animate-fade-in-up" style="animation-delay: 0.2s;">
+            Transform your PDFs into interactive learning experiences with AI-powered summaries and intelligent Q&A
+        </p>
+        <div class="animate-fade-in-up" style="animation-delay: 0.4s;">
+            <a href="{% url 'easylearning:upload_pdf' %}" class="btn btn-light btn-lg me-3">
+                <i class="fas fa-upload me-2"></i>Start Learning
+            </a>
+            <a href="#features" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-info-circle me-2"></i>Learn More
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Why Choose EasyLearning?</h2>
+            <p class="lead text-muted">Experience the future of learning with our cutting-edge AI technology</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-file-pdf fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Smart PDF Processing</h5>
+                        <p class="card-text text-muted">Upload any PDF and get instant AI-generated summaries that capture the key points and insights.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-robot fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">AI-Powered Q&A</h5>
+                        <p class="card-text text-muted">Ask questions about your PDF content and get intelligent answers with source verification and confidence scores.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-warning bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-comments fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Conversation Threads</h5>
+                        <p class="card-text text-muted">Organize your learning with conversation threads that remember your questions and maintain context.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">How It Works</h2>
+            <p class="lead text-muted">Get started in just a few simple steps</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                    <span class="fw-bold fs-4">1</span>
+                </div>
+                <h5 class="fw-bold">Upload PDF</h5>
+                <p class="text-muted">Simply upload your PDF document with a descriptive title.</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                    <span class="fw-bold fs-4">2</span>
+                </div>
+                <h5 class="fw-bold">Get Summary</h5>
+                <p class="text-muted">Receive an intelligent summary of your document's key points.</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="bg-warning bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                    <span class="fw-bold fs-4">3</span>
+                </div>
+                <h5 class="fw-bold">Ask Questions</h5>
+                <p class="text-muted">Ask questions about your document and get relevant answers.</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="bg-info bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                    <span class="fw-bold fs-4">4</span>
+                </div>
+                <h5 class="fw-bold">Learn & Explore</h5>
+                <p class="text-muted">Engage in conversations and deepen your understanding.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PDFs Section -->
+{% if pdfs %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="display-6 fw-bold mb-0">Your Learning Documents</h2>
+            <a href="{% url 'easylearning:upload_pdf' %}" class="btn btn-outline-primary">
+                <i class="fas fa-plus me-2"></i>Add New
+            </a>
+        </div>
+        <div class="row g-4">
+            {% for pdf in pdfs %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="bg-primary bg-gradient text-white rounded p-2">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-calendar me-1"></i>{{ pdf.uploaded_at|date:"M d" }}
+                            </span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-2">{{ pdf.title }}</h5>
+                        <p class="card-text text-muted small mb-3">
+                            <i class="fas fa-clock me-1"></i>Uploaded {{ pdf.uploaded_at|timesince }} ago
+                        </p>
+                        {% if pdf.summary %}
+                            <p class="card-text text-muted small mb-3">
+                                {{ pdf.summary.summary_text|truncatewords:15 }}
+                            </p>
+                        {% endif %}
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'easylearning:pdf_detail' pdf.id %}" class="btn btn-outline-primary btn-sm flex-fill">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            {% if pdf.conversations.exists %}
+                            <a href="{% url 'easylearning:thread_detail' pdf.conversations.first.id %}" class="btn btn-outline-success btn-sm flex-fill">
+                                <i class="fas fa-comments me-1"></i>Start Chat
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% else %}
+<!-- Empty State -->
+<section class="py-5">
+    <div class="container text-center">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body py-5">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-file-pdf fa-3x text-muted"></i>
+                </div>
+                <h3 class="fw-bold mb-3">No PDFs Yet</h3>
+                <p class="text-muted mb-4">Start your learning journey by uploading your first PDF document</p>
+                <a href="{% url 'easylearning:upload_pdf' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-upload me-2"></i>Upload Your First PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+    <div class="container text-center text-white">
+        <h2 class="display-5 fw-bold mb-4">Start Your Learning Journey Today</h2>
+        <p class="lead mb-4">Join thousands of learners who are already using EasyLearning to enhance their study experience</p>
+        <a href="{% url 'easylearning:upload_pdf' %}" class="btn btn-light btn-lg">
+            <i class="fas fa-rocket me-2"></i>Get Started Now
+        </a>
+    </div>
+</section>
+{% endblock %} 

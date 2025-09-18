@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Test - Fresh Implementation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        
+        .dropdown-menu.show {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 9999 !important;
+            position: absolute !important;
+        }
+        
+        .dropdown {
+            position: relative !important;
+        }
+        
+        .dropdown-menu {
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            margin-top: 0.125rem !important;
+            min-width: 200px !important;
+        }
+        
+        .dropdown-item {
+            cursor: pointer !important;
+            padding: 8px 16px !important;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa !important;
+        }
+        
+        .status-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .btn-test {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-graduation-cap text-primary me-2"></i>
+            Dropdown Test - Fresh Implementation
+        </h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Test Dropdown 1:</h5>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="testDropdown1">
+                        <i class="fas fa-user me-2"></i>Test User
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="testDropdown1">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h5>Test Dropdown 2:</h5>
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle" type="button" id="testDropdown2">
+                        <i class="fas fa-cog me-2"></i>Options
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="testDropdown2">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-copy me-2"></i>Copy</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-secondary btn-test" onclick="testDropdown1()">Test Dropdown 1</button>
+            <button class="btn btn-secondary btn-test" onclick="testDropdown2()">Test Dropdown 2</button>
+            <button class="btn btn-warning btn-test" onclick="closeAllDropdowns()">Close All</button>
+            <button class="btn btn-info btn-test" onclick="clearLog()">Clear Log</button>
+        </div>
+        
+        <div class="status-box mt-4">
+            <strong>Status Log:</strong>
+            <div id="status">Ready to test dropdowns...</div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/home/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let dropdownProcessing = false;
+        
+        function log(message) {
+            const status = document.getElementById('status');
+            const timestamp = new Date().toLocaleTimeString();
+            status.innerHTML += `<br>[${timestamp}] ${message}`;
+            status.scrollTop = status.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('status').innerHTML = 'Log cleared...';
+        }
+        
+        function toggleDropdown(dropdownToggle) {
+            if (dropdownProcessing) {
+                log('Dropdown processing in progress, skipping...');
+                return;
+            }
+            
+            dropdownProcessing = true;
+            
+            const dropdownMenu = dropdownToggle.nextElementSibling;
+            if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                const isVisible = dropdownMenu.classList.contains('show');
+                
+                // Close all other dropdowns first
+                document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                    menu.classList.remove('show');
+                });
+                document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(function(toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+                
+                // Toggle current dropdown
+                if (!isVisible) {
+                    dropdownMenu.classList.add('show');
+                    dropdownToggle.setAttribute('aria-expanded', 'true');
+                    log(`Dropdown opened: ${dropdownToggle.textContent.trim()}`);
+                } else {
+                    dropdownMenu.classList.remove('show');
+                    dropdownToggle.setAttribute('aria-expanded', 'false');
+                    log(`Dropdown closed: ${dropdownToggle.textContent.trim()}`);
+                }
+            }
+            
+            setTimeout(function() {
+                dropdownProcessing = false;
+            }, 100);
+        }
+        
+        function testDropdown1() {
+            const dropdown = document.getElementById('testDropdown1');
+            log('Testing Dropdown 1...');
+            toggleDropdown(dropdown);
+        }
+        
+        function testDropdown2() {
+            const dropdown = document.getElementById('testDropdown2');
+            log('Testing Dropdown 2...');
+            toggleDropdown(dropdown);
+        }
+        
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                menu.classList.remove('show');
+            });
+            document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(function(toggle) {
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+            log('All dropdowns closed');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded, initializing dropdowns...');
+            
+            // Set up dropdown event listeners
+            document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+                log(`Setting up dropdown for: ${element.textContent.trim()}`);
+                
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    log(`Dropdown clicked: ${this.textContent.trim()}`);
+                    
+                    requestAnimationFrame(function() {
+                        toggleDropdown(element);
+                    });
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.dropdown-toggle')) {
+                    return;
+                }
+                
+                if (e.target.closest('.dropdown-menu')) {
+                    return;
+                }
+                
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                        menu.classList.remove('show');
+                    });
+                    document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(function(toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                    log('Closed dropdowns (click outside)');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                        menu.classList.remove('show');
+                    });
+                    document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(function(toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                    log('Closed dropdowns (escape key)');
+                }
+            });
+            
+            log('Dropdown initialization complete');
+        });
+    </script>
+</body>
+</html> 

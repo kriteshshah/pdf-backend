@@ -1,0 +1,546 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pdf_doc.title }} - EasyLearning{% endblock %}
+
+{% block extra_css %}
+<style>
+.pdf-detail-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.pdf-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.pdf-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.pdf-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.pdf-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-meta {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.pdf-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pdf-actions .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.pdf-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.content-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.content-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+}
+
+.section-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.section-header .icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.section-body {
+    padding: 2rem;
+}
+
+.summary-content {
+    max-height: 400px;
+    overflow-y: auto;
+    line-height: 1.8;
+    font-size: 1rem;
+    color: #2c3e50;
+    padding-right: 1rem;
+}
+
+.summary-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.summary-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.summary-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.summary-content::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+.info-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.thread-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.thread-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.thread-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.thread-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+}
+
+.thread-title:hover {
+    color: var(--primary-color);
+}
+
+.thread-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.thread-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.thread-meta i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.thread-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.thread-actions .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+.quick-action-btn i {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h5 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.empty-state p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .pdf-title {
+        font-size: 2rem;
+    }
+    
+    .pdf-actions {
+        justify-content: center;
+    }
+    
+    .pdf-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pdf-detail-container">
+    <!-- PDF Header -->
+    <section class="pdf-header">
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="pdf-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h1 class="pdf-title">{{ pdf_doc.title }}</h1>
+                    <div class="pdf-meta">
+                        <i class="fas fa-calendar me-2"></i>Uploaded on {{ pdf_doc.uploaded_at|date:"F d, Y" }}
+                        {% if pdf_doc.uploaded_by %}
+                            <span class="ms-3">
+                                <i class="fas fa-user me-2"></i>by {{ pdf_doc.uploaded_by.username }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="pdf-actions">
+                        <a href="{{ pdf_doc.file.url }}" class="btn btn-light" target="_blank">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </a>
+                        <a href="{% url 'easylearning:create_thread' pdf_doc.id %}" class="btn btn-outline-light">
+                            <i class="fas fa-plus me-2"></i>New Thread
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-4">
+                <!-- Document Summary -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h5>
+                            <div class="icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            Document Summary
+                        </h5>
+                    </div>
+                    <div class="section-body">
+                        {% if summary %}
+                            <div class="summary-content">
+                                {{ summary.summary_text }}
+                            </div>
+                            <div class="mt-3 pt-3 border-top">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Generated on {{ summary.generated_at|date:"M d, Y" }}
+                                </small>
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h5>No Summary Available</h5>
+                                <p>The document summary is being generated. Please check back later.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Document Information -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h5>
+                            <div class="icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            Document Information
+                        </h5>
+                    </div>
+                    <div class="section-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-file"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">File Name</div>
+                                    <div class="info-value">{{ pdf_doc.file.name|slice:"5:" }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Upload Date</div>
+                                    <div class="info-value">{{ pdf_doc.uploaded_at|date:"M d, Y H:i" }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Conversation Threads</div>
+                                    <div class="info-value">{{ threads.count }} thread{{ threads.count|pluralize }}</div>
+                                </div>
+                            </div>
+                            {% if pdf_doc.uploaded_by %}
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Document Owner</div>
+                                    <div class="info-value">{{ pdf_doc.uploaded_by.username }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-8">
+                <!-- Conversation Threads -->
+                <div class="content-section">
+                    <div class="section-header d-flex justify-content-between align-items-center">
+                        <h5>
+                            <div class="icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            Conversation Threads
+                        </h5>
+                        <a href="{% url 'easylearning:create_thread' pdf_doc.id %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-plus me-1"></i>New Thread
+                        </a>
+                    </div>
+                    <div class="section-body">
+                        {% if threads %}
+                            {% for thread in threads %}
+                                <div class="thread-card" onclick="window.location.href='{% url 'easylearning:thread_detail' thread.id %}'">
+                                    <div class="thread-header">
+                                        <div class="flex-grow-1">
+                                            <h6 class="thread-title">{{ thread.title }}</h6>
+                                            <div class="thread-meta">
+                                                <span>
+                                                    <i class="fas fa-calendar"></i>
+                                                    Created {{ thread.created_at|date:"M d, Y" }}
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-clock"></i>
+                                                    Updated {{ thread.updated_at|date:"M d, Y" }}
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-question-circle"></i>
+                                                    {{ thread.questions.count }} question{{ thread.questions.count|pluralize }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="thread-actions">
+                                            <a href="{% url 'easylearning:thread_detail' thread.id %}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-arrow-right me-1"></i>Open
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-comments"></i>
+                                <h5>No Conversation Threads Yet</h5>
+                                <p>Start the first conversation about this document by creating a new thread.</p>
+                                <a href="{% url 'easylearning:create_thread' pdf_doc.id %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plus me-2"></i>Create First Thread
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h5>
+                            <div class="icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            Quick Actions
+                        </h5>
+                    </div>
+                    <div class="section-body">
+                        <div class="quick-actions">
+                            <a href="{% url 'easylearning:create_thread' pdf_doc.id %}" class="quick-action-btn">
+                                <i class="fas fa-comments"></i>
+                                Start New Discussion
+                            </a>
+                            <a href="{{ pdf_doc.file.url }}" class="quick-action-btn" target="_blank">
+                                <i class="fas fa-eye"></i>
+                                View Original PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

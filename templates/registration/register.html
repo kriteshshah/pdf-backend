@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - EasyLearning{% endblock %}
+
+{% block extra_css %}
+<style>
+.register-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.register-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.register-header .logo {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.register-header h2 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.register-header p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.form-group.full-width {
+    flex: none;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-control.error {
+    border-color: #e74c3c;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.btn-register {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}
+
+.register-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.register-footer a:hover {
+    color: #764ba2;
+}
+
+.password-strength {
+    margin-top: 5px;
+    font-size: 0.8rem;
+}
+
+.strength-weak { color: #e74c3c; }
+.strength-medium { color: #f39c12; }
+.strength-strong { color: #27ae60; }
+
+.terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.terms-checkbox input[type="checkbox"] {
+    margin-top: 3px;
+}
+
+.terms-checkbox label {
+    font-size: 0.9rem;
+    color: #2c3e50;
+    line-height: 1.4;
+}
+
+.terms-checkbox a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.terms-checkbox a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2>Join EasyLearning</h2>
+            <p>Create your account to start your learning journey</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" id="registerForm">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_first_name">
+                        <i class="fas fa-user me-2"></i>First Name
+                    </label>
+                    <input type="text" 
+                           name="first_name" 
+                           id="id_first_name" 
+                           class="form-control" 
+                           placeholder="Enter your first name"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_last_name">
+                        <i class="fas fa-user me-2"></i>Last Name
+                    </label>
+                    <input type="text" 
+                           name="last_name" 
+                           id="id_last_name" 
+                           class="form-control" 
+                           placeholder="Enter your last name"
+                           required>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="id_username">
+                    <i class="fas fa-at me-2"></i>Username
+                </label>
+                <input type="text" 
+                       name="username" 
+                       id="id_username" 
+                       class="form-control" 
+                       placeholder="Choose a unique username"
+                       required>
+                {% if form.username.errors %}
+                    <div class="error-message">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group full-width">
+                <label for="id_email">
+                    <i class="fas fa-envelope me-2"></i>Email Address
+                </label>
+                <input type="email" 
+                       name="email" 
+                       id="id_email" 
+                       class="form-control" 
+                       placeholder="Enter your email address"
+                       required>
+                {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_password1">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <input type="password" 
+                           name="password1" 
+                           id="id_password1" 
+                           class="form-control" 
+                           placeholder="Create a strong password"
+                           required>
+                    <div class="password-strength" id="passwordStrength"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_password2">
+                        <i class="fas fa-lock me-2"></i>Confirm Password
+                    </label>
+                    <input type="password" 
+                           name="password2" 
+                           id="id_password2" 
+                           class="form-control" 
+                           placeholder="Confirm your password"
+                           required>
+                </div>
+            </div>
+
+            {% if form.password1.errors %}
+                <div class="error-message">{{ form.password1.errors.0 }}</div>
+            {% endif %}
+            {% if form.password2.errors %}
+                <div class="error-message">{{ form.password2.errors.0 }}</div>
+            {% endif %}
+
+            <div class="terms-checkbox">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">
+                    I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-register">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+        </form>
+
+        <div class="register-footer">
+            <p>Already have an account? <a href="{% url 'easylearning:login' %}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
+    const strengthDiv = document.getElementById('passwordStrength');
+    
+    password1.addEventListener('input', function() {
+        const password = this.value;
+        const strength = checkPasswordStrength(password);
+        updatePasswordStrength(strength);
+    });
+    
+    password2.addEventListener('input', function() {
+        checkPasswordMatch();
+    });
+    
+    function checkPasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        
+        if (score < 2) return 'weak';
+        if (score < 4) return 'medium';
+        return 'strong';
+    }
+    
+    function updatePasswordStrength(strength) {
+        const messages = {
+            weak: 'Password is too weak',
+            medium: 'Password strength is medium',
+            strong: 'Password is strong!'
+        };
+        
+        strengthDiv.textContent = messages[strength];
+        strengthDiv.className = `password-strength strength-${strength}`;
+    }
+    
+    function checkPasswordMatch() {
+        const p1 = password1.value;
+        const p2 = password2.value;
+        
+        if (p2 && p1 !== p2) {
+            password2.classList.add('error');
+            if (!password2.nextElementSibling || !password2.nextElementSibling.classList.contains('error-message')) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = 'Passwords do not match';
+                password2.parentNode.appendChild(errorDiv);
+            }
+        } else {
+            password2.classList.remove('error');
+            const errorDiv = password2.parentNode.querySelector('.error-message');
+            if (errorDiv) errorDiv.remove();
+        }
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload PDF - EasyLearning{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-upload me-2"></i>Upload PDF Document
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="pdfUploadForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-heading me-2"></i>Document Title
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Give your document a descriptive title for easy identification.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.file.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-file-pdf me-2"></i>PDF File
+                            </label>
+                            
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-content text-center p-5">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">Drag & Drop your PDF here</h5>
+                                    <p class="text-muted mb-3">or</p>
+                                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('visibleFileInput').click()">
+                                        <i class="fas fa-folder-open me-2"></i>Browse Files
+                                    </button>
+                                    <p class="text-muted small mt-2">Maximum file size: 10MB</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden file input that will be used for form submission -->
+                            <div style="display: none;">
+                                {{ form.file }}
+                            </div>
+                            
+                            <!-- Visible file input for user interaction -->
+                            <input type="file" 
+                                   id="visibleFileInput" 
+                                   accept=".pdf" 
+                                   class="form-control mt-2"
+                                   style="display: none;">
+                            
+                            {% if form.file.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.file.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="fas fa-upload me-2"></i>Upload & Process PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Upload Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Upload Guidelines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-check-circle text-success me-2"></i>Supported Formats</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-file-pdf text-danger me-2"></i>PDF documents (.pdf)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Limitations</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-weight-hanging me-2"></i>Maximum size: 10MB</li>
+                                <li><i class="fas fa-text-width me-2"></i>Text-based PDFs work best</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f3ff;
+}
+
+.upload-area input[type="file"] {
+    display: none;
+}
+
+.upload-content {
+    pointer-events: none;
+}
+
+.upload-area:hover .upload-content {
+    pointer-events: auto;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const visibleFileInput = document.getElementById('visibleFileInput');
+    const hiddenFileInput = document.getElementById('{{ form.file.id_for_label }}');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('pdfUploadForm');
+    
+    console.log('Upload form initialized');
+    console.log('Visible file input:', visibleFileInput);
+    console.log('Hidden file input:', hiddenFileInput);
+    
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            console.log('File dropped:', files[0]);
+            // Set both inputs
+            visibleFileInput.files = files;
+            hiddenFileInput.files = files;
+            updateFileDisplay(files[0]);
+        }
+    });
+    
+    // File input change for visible input
+    visibleFileInput.addEventListener('change', function(e) {
+        console.log('Visible file input changed:', e.target.files);
+        if (e.target.files.length > 0) {
+            // Sync with hidden input
+            hiddenFileInput.files = e.target.files;
+            updateFileDisplay(e.target.files[0]);
+        }
+    });
+    
+    // File input change for hidden input (backup)
+    hiddenFileInput.addEventListener('change', function(e) {
+        console.log('Hidden file input changed:', e.target.files);
+        if (e.target.files.length > 0) {
+            // Sync with visible input
+            visibleFileInput.files = e.target.files;
+            updateFileDisplay(e.target.files[0]);
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        console.log('Visible file input files:', visibleFileInput.files);
+        console.log('Hidden file input files:', hiddenFileInput.files);
+        
+        // Check if file is selected in either input
+        const hasFile = (visibleFileInput.files && visibleFileInput.files.length > 0) || 
+                       (hiddenFileInput.files && hiddenFileInput.files.length > 0);
+        
+        if (!hasFile) {
+            e.preventDefault();
+            alert('Please select a PDF file before submitting.');
+            return;
+        }
+        
+        // Ensure hidden input has the file for Django form processing
+        if (visibleFileInput.files && visibleFileInput.files.length > 0) {
+            hiddenFileInput.files = visibleFileInput.files;
+        }
+        
+        const selectedFile = hiddenFileInput.files[0] || visibleFileInput.files[0];
+        console.log('Selected file for submission:', selectedFile);
+        
+        // Validate file type
+        if (!selectedFile.name.toLowerCase().endsWith('.pdf')) {
+            e.preventDefault();
+            alert('Please select a valid PDF file.');
+            return;
+        }
+        
+        // Validate file size
+        if (selectedFile.size > 10 * 1024 * 1024) {
+            e.preventDefault();
+            alert('File size must be under 10MB.');
+            return;
+        }
+        
+        console.log('Form validation passed, submitting...');
+        console.log('Final hidden input files:', hiddenFileInput.files);
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+    });
+    
+    function updateFileDisplay(file) {
+        console.log('Updating file display for:', file);
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+            uploadArea.innerHTML = `
+                <div class="upload-content text-center p-4">
+                    <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                    <h6 class="text-success">${file.name}</h6>
+                    <p class="text-muted small mb-0">Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="resetUploadArea()">
+                        <i class="fas fa-times me-1"></i>Change File
+                    </button>
+                </div>
+            `;
+            console.log('File display updated successfully');
+        } else {
+            alert('Please select a valid PDF file.');
+            visibleFileInput.value = '';
+            hiddenFileInput.value = '';
+            console.log('Invalid file type, resetting inputs');
+        }
+    }
+    
+    window.resetUploadArea = function() {
+        console.log('Resetting upload area');
+        visibleFileInput.value = '';
+        hiddenFileInput.value = '';
+        uploadArea.innerHTML = `
+            <div class="upload-content text-center p-5">
+                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Drag & Drop your PDF here</h5>
+                <p class="text-muted mb-3">or</p>
+                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('visibleFileInput').click()">
+                    <i class="fas fa-folder-open me-2"></i>Browse Files
+                </button>
+                <p class="text-muted small mt-2">Maximum file size: 10MB</p>
+            </div>
+        `;
+    };
+    
+    // Update the browse button to use visible input
+    const browseButton = uploadArea.querySelector('button');
+    if (browseButton) {
+        browseButton.onclick = function() {
+            visibleFileInput.click();
+        };
+    }
+});
+</script>
+{% endblock %} 

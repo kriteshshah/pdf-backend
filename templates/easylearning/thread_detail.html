@@ -1,0 +1,819 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ thread.title }} - EasyLearning{% endblock %}
+
+{% block extra_css %}
+<style>
+.thread-detail-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.thread-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.thread-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.thread-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.thread-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.thread-meta {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.thread-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.thread-actions .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.thread-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.content-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.content-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+}
+
+.section-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.section-header .icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.section-body {
+    padding: 2rem;
+}
+
+.qa-item {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.qa-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.question-section {
+    margin-bottom: 2rem;
+}
+
+.question-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.question-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1.5rem;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.question-content {
+    flex: 1;
+}
+
+.question-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+.question-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.question-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.question-meta i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.answer-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.answer-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.answer-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.answer-content {
+    flex: 1;
+}
+
+.answer-text {
+    font-size: 1rem;
+    color: #2c3e50;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.answer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.answer-badges {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: white;
+}
+
+.answer-timestamp {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.ask-question-form {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.form-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+}
+
+.form-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.form-header .icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.form-body {
+    padding: 2rem;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tips-section {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.tips-section h6 {
+    color: #856404;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tips-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: #856404;
+    font-size: 0.9rem;
+}
+
+.tips-list i {
+    margin-right: 0.75rem;
+    color: #28a745;
+}
+
+.thread-info {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.info-header {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    padding: 1.5rem;
+}
+
+.info-header h6 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.info-header .icon {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    font-size: 1rem;
+}
+
+.info-body {
+    padding: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    font-size: 1rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.language-card {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.language-card:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.language-info {
+    border: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.empty-state h5 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.empty-state p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .thread-title {
+        font-size: 2rem;
+    }
+    
+    .thread-actions {
+        justify-content: center;
+    }
+    
+    .thread-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .answer-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="thread-detail-container">
+    <!-- Thread Header -->
+    <section class="thread-header">
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="thread-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h1 class="thread-title">{{ thread.title }}</h1>
+                    <div class="thread-meta">
+                        <i class="fas fa-file-pdf me-2"></i>Document: {{ thread.pdf_document.title }}
+                        <span class="ms-3">
+                            <i class="fas fa-calendar me-2"></i>Created {{ thread.created_at|date:"F d, Y" }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="thread-actions">
+                        <a href="{% url 'easylearning:pdf_detail' thread.pdf_document.id %}" class="btn btn-light">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Document
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row">
+            <!-- Questions and Answers -->
+            <div class="col-lg-8">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h5>
+                            <div class="icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            Questions & Answers
+                        </h5>
+                    </div>
+                    <div class="section-body">
+                        {% if questions %}
+                            {% for question in questions %}
+                                <div class="qa-item">
+                                    <!-- Question -->
+                                    <div class="question-section">
+                                        <div class="question-header">
+                                            <div class="question-icon">
+                                                <i class="fas fa-question-circle"></i>
+                                            </div>
+                                            <div class="question-content">
+                                                <div class="question-text">{{ question.question_text }}</div>
+                                                <div class="question-meta">
+                                                    <span>
+                                                        <i class="fas fa-calendar"></i>
+                                                        {{ question.asked_at|date:"M d, Y H:i" }}
+                                                    </span>
+                                                    {% if question.asked_by %}
+                                                        <span>
+                                                            <i class="fas fa-user"></i>
+                                                            {{ question.asked_by.username }}
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Answer -->
+                                    {% if question.answer %}
+                                        <div class="answer-section">
+                                            <div class="answer-header">
+                                                <div class="answer-icon">
+                                                    <i class="fas fa-robot"></i>
+                                                </div>
+                                                <div class="answer-content">
+                                                    <div class="answer-text">{{ question.answer.answer_text }}</div>
+                                                    
+                                                    <!-- Answer Metadata -->
+                                                    <div class="answer-meta">
+                                                        <div class="answer-badges">
+                                                            {% if question.answer.is_from_pdf %}
+                                                                <span class="badge badge-success">
+                                                                    <i class="fas fa-check me-1"></i>From PDF
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="badge badge-warning">
+                                                                    <i class="fas fa-exclamation-triangle me-1"></i>Not from PDF
+                                                                </span>
+                                                            {% endif %}
+                                                            
+                                                            {% if question.answer.confidence_score > 0 %}
+                                                                <span class="text-muted small">
+                                                                    Confidence: {{ question.answer.confidence_score|floatformat:2 }}
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                        
+                                                        <div class="answer-timestamp">
+                                                            <i class="fas fa-clock me-1"></i>{{ question.answer.generated_at|date:"M d, Y H:i" }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="loading-state">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                            <p>Processing answer...</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-question-circle"></i>
+                                <h5>No Questions Yet</h5>
+                                <p>Be the first to ask a question about this document!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Ask Question Form -->
+                <div class="ask-question-form">
+                    <div class="form-header">
+                        <h5>
+                            <div class="icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            Ask a Question
+                        </h5>
+                    </div>
+                    <div class="form-body">
+                        <form method="post" id="questionForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ form.question_text.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-question-circle me-2"></i>Your Question
+                                </label>
+                                {{ form.question_text }}
+                                {% if form.question_text.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.question_text.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.language.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-language me-2"></i>Answer Language
+                                </label>
+                                {{ form.language }}
+                                {% if form.language.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.language.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary" id="submitQuestionBtn">
+                                    <i class="fas fa-paper-plane me-2"></i>Ask Question
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Question Guidelines -->
+                        <div class="tips-section">
+                            <h6>
+                                <i class="fas fa-lightbulb me-2"></i>Tips for Better Questions
+                            </h6>
+                            <ul class="tips-list">
+                                <li>
+                                    <i class="fas fa-check"></i>Be specific and clear
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i>Ask about specific concepts or facts
+                                </li>
+                                <li>
+                                    <i class="fas fa-check"></i>Reference specific sections if possible
+                                </li>
+                                <li>
+                                    <i class="fas fa-language"></i>Choose your preferred language for the answer
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Language Info -->
+                        <div class="language-info mt-3 p-3 bg-light rounded">
+                            <h6 class="text-primary">
+                                <i class="fas fa-globe me-2"></i>Multi-Language Support
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="language-card text-center p-2">
+                                        <i class="fas fa-flag-usa text-primary"></i>
+                                        <div class="fw-bold">English</div>
+                                        <small class="text-muted">Default language</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="language-card text-center p-2">
+                                        <i class="fas fa-flag text-success"></i>
+                                        <div class="fw-bold">ગુજરાતી</div>
+                                        <small class="text-muted">Gujarati</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="language-card text-center p-2">
+                                        <i class="fas fa-flag text-warning"></i>
+                                        <div class="fw-bold">हिंदी</div>
+                                        <small class="text-muted">Hindi</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Thread Info -->
+                <div class="thread-info">
+                    <div class="info-header">
+                        <h6>
+                            <div class="icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            Thread Information
+                        </h6>
+                    </div>
+                    <div class="info-body">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Questions</div>
+                                <div class="info-value">{{ questions.count }} question{{ questions.count|pluralize }}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Created</div>
+                                <div class="info-value">{{ thread.created_at|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Updated</div>
+                                <div class="info-value">{{ thread.updated_at|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Document</div>
+                                <div class="info-value">{{ thread.pdf_document.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionForm = document.getElementById('questionForm');
+    const submitBtn = document.getElementById('submitQuestionBtn');
+    
+    questionForm.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+    });
+    
+    // Auto-scroll to bottom when new questions are added
+    if (window.location.hash === '#new-question') {
+        const qaList = document.querySelector('.section-body');
+        if (qaList) {
+            qaList.scrollTop = qaList.scrollHeight;
+        }
+    }
+});
+</script>
+{% endblock %} 
